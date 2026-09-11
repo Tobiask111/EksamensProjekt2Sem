@@ -1,0 +1,61 @@
+/* Client/Pages/ProjectDetailsPage.razor.css */
+
+/* Variabler til jeres brand farver */
+:root {
+    --brand-dark: #071226;
+    --brand-text: #071226;
+}
+
+/* Generelle hjælpeklasser til brand-farven */
+.bg-brand {
+    background-color: var(--brand-dark) !important;
+    color: white;
+}
+
+.border-brand {
+    border-color: var(--brand-dark) !important;
+}
+
+.text-brand {
+    color: var(--brand-text) !important;
+}
+
+.badge-brand {
+    background-color: var(--brand-dark) !important;
+    color: white;
+}
+
+.container{
+    margin-top: 3rem;
+}
+
+/* Toggle Switch styling */
+.form-check-input {
+    cursor: pointer;
+    width: 3em;
+    height: 1.5em;
+}
+
+.switch-label {
+    padding-top: 4px;
+    font-weight: bold;
+    margin-left: 0.5rem;
+}
+
+/* Scrollable lister */
+.scrollable-list-container {
+    max-height: 500px;
+    display: flex;
+    flex-direction: column;
+}
+
+.scrollable-content {
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Tabel header */
+.table-header-brand {
+    background-color: var(--brand-dark);
+    color: white;
+}

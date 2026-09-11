@@ -1,0 +1,128 @@
+@using Core
+@using Blazored.LocalStorage
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager Nav
+@inject Client.Service.UserRepository UserRepo
+@page "/login"
+<PageTitle>Log ind</PageTitle>
+
+<div class="login-page-back">
+    <div class="login-con">
+        <h3>Log ind</h3>
+
+        <EditForm Model="@user" OnValidSubmit="OnClickLogin">
+            <div class="form-floating-group">
+                <InputText id="un" class="form-control" @bind-Value="user.UserName" placeholder="Username" />
+                <label for="un">Username</label>
+            </div>
+
+            <div class="form-floating-group">
+                <InputText id="pwd"
+                           type="@PasswordType"
+                           class="form-control"
+                           @bind-Value="user.Password"
+                           placeholder="Password" />
+                <label for="pwd">Password</label>
+
+                @* Brug en button type="button" så vi ikke utilsigtet submitter formen *@
+                <button type="button" class="btn btn-link p-0" @onclick="TogglePasswordVisibility" aria-label="Toggle password visibility">
+                    <i class="bi @(visPassword ? "bi-eye-slash" : "bi-eye")"></i>
+                </button>
+            </div>
+
+            <div style="text-align: center">
+                <button type="submit" class="btn btn-primary" disabled="@isLoading">
+                    @if (isLoading)
+                    {
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <span class="visually-hidden"> Logging in...</span>
+                    }
+                    else
+                    {
+                        <span>Login</span>
+                    }
+                </button>
+            </div>
+        </EditForm>
+
+        @if (!string.IsNullOrEmpty(errorText))
+        {
+            <div class="error-message">
+                <span class="error-icon">⚠️</span>
+                <span class="error-text">@errorText</span>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    Users user = new();
+    string errorText = "";
+    bool visPassword = false;
+    bool isLoading = false; // Styrer om spinneren vises
+
+    // Bestemmer input-feltets type baseret på om visPassword er sand/falsk
+    string PasswordType => visPassword ? "text" : "password";
+
+    void TogglePasswordVisibility()
+    {
+        visPassword = !visPassword;
+    }
+
+    private async Task OnClickLogin()
+    {
+        errorText = "";
+        isLoading = true; // Starter loading animationen
+
+        try
+        {
+            // Forsøg at logge ind via API'et (UserRepo sender data til serveren)
+            Users? userObject = await UserRepo.ValidLoginAsync(user.UserName, user.Password);
+
+            if (userObject == null)
+            {
+                // Hvis serveren returnerer null, var login ugyldigt
+                errorText = "Forkert brugernavn eller adgangskode — prøv igen.";
+                isLoading = false;
+                return;
+            }
+
+            //Fjern adgangskoden fra objektet før vi gemmer det i browseren
+            // Vi vil aldrig have passwords liggende i LocalStorage
+            try
+            {
+                userObject.Password = string.Empty; 
+            }
+            catch 
+            {
+                // Hvis vi ikke kan tømme passwordet direkte, laver vi et nyt "sikkert" objekt
+                var safeUser = new
+                {
+                    userObject.UserName, userObject.Role
+                };
+                await LocalStorage.SetItemAsync("user", safeUser);
+                Nav.NavigateTo("/", forceLoad: true); 
+                return;
+            }
+
+            // Gem brugeren i LocalStorage så vi kan huske at de er logget ind
+            await LocalStorage.SetItemAsync("user", userObject);
+            
+            // Naviger til forsiden (forceLoad: true sikrer at App.razor genindlæses og tjekker login-status)
+            Nav.NavigateTo("/", forceLoad: true);
+        }
+        catch (HttpRequestException)
+        {
+            errorText = "Netværksfejl — kunne ikke kontakte serveren. Tjek at serveren kører.";
+        }
+        catch (Exception ex)
+        {
+            errorText = $"Der skete en fejl: {ex.Message}";
+        }
+        finally
+        {
+            // Sørger for at fjerne loading-spinneren uanset om det gik godt eller skidt
+            isLoading = false;
+        }
+    }
+}

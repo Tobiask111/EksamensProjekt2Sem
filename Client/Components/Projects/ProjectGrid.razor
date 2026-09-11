@@ -1,0 +1,22 @@
+@*@using Core
+
+
+<div class="ads-grid">
+    @if (Projects == null || !Projects.Any())
+    {
+        <p></p>
+    }
+    else
+    {
+        @foreach (var a in Projects)
+        {
+            <ProjectComponent Project="a" OnDelete="OnDelete" />
+        }
+    }
+</div>
+
+@code 
+{
+    [Parameter] public IEnumerable<Project>? Projects { get; set; }
+    [Parameter] public EventCallback<int> OnDelete { get; set; }
+}*@

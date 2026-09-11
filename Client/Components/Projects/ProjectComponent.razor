@@ -1,0 +1,73 @@
+@*@using Core
+@inject NavigationManager Nav
+
+
+
+<article class="ad-card">
+    <div class="ad-media">
+        <img src="@Project?.ImageUrl" alt="Project billede" />
+        <div class="price-badge">
+            <button class="dots-btn" @onclick="ToggleMenu" @onfocusout="CloseMenuDelayed">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
+                    <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/>
+                </svg>
+            </button>
+            
+            @if (_showMenu)
+            {
+                <div class="dropdown-menu">
+                    <button class="dropdown-item" @onclick="GotoEditPage">Rediger</button>
+                    <button class="dropdown-item danger" @onclick="DeleteProject">Slet projekt</button>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="ad-body">
+        <div class="ad-meta">Oprettet: @Project.DateCreated</div>
+        <div class="ad-title">@Project.Name</div>
+    </div>
+
+    <div class="ad-footer">
+        <button class="MoreBtn" @onclick="() => GotoDetailPage()" >Se detaljer</button>
+    </div>
+</article>
+
+@code {
+    [Parameter] public Project? Project { get; set; }
+    [Parameter] public EventCallback<int> OnDelete { get; set; }
+    
+    private Task GotoDetailPage()
+    {
+        var id = Project.ProjectId;
+        Nav.NavigateTo($"project/{id}");
+        return Task.CompletedTask;
+    }
+    
+    private Task GotoEditPage()
+    {
+        var id = Project?.ProjectId;
+        Nav.NavigateTo($"project/edit/{id}");
+        return Task.CompletedTask;
+    }
+
+    private bool _showMenu = false;
+
+    private void ToggleMenu()
+    {
+        _showMenu = !_showMenu;
+    }
+    
+    private async Task CloseMenuDelayed()
+    {
+        await Task.Delay(200); 
+        _showMenu = false;
+    }
+
+    private async Task DeleteProject()
+    {
+        if (OnDelete.HasDelegate) await OnDelete.InvokeAsync(Project.ProjectId);
+    }
+    
+    
+}*@

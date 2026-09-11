@@ -1,0 +1,113 @@
+@using Core
+@namespace Client.Components.ProjectDetails
+
+@if (Details != null)
+{
+    // TOP BANNER
+    <div class="card text-white mb-4 shadow text-center" style="@(IsClientView ? "background-color: #071226;" : "background-color: #071226;")">
+        <div class="card-body py-4">
+            @if (IsClientView)
+            {
+                // Kundevisning: Kun den store samlede pris
+                <h2 class="display-3 fw-bold">@Details.SamletTotalPris.ToString("N2") kr.</h2>
+                <p class="fs-5 mb-0">Total Pris</p>
+            }
+            else
+            {
+                // Intern visning: Fokus på fortjeneste
+                <div class="row text-center divide-cols">
+                    <div class="col-md-4">
+                        <h6 class="text-white-50">TOTAL PRIS</h6>
+                        <h2>@Details.SamletTotalPris.ToString("N2") kr.</h2>
+                    </div>
+                    <div class="col-md-4" style="border-left: 1px solid rgba(255,255,255,0.2); border-right: 1px solid rgba(255,255,255,0.2);">
+                        <h6 class="text-white-50">KOST TOTAL</h6>
+                        <h2>@Details.SamletKostPris.ToString("N2") kr.</h2>
+                    </div>
+                    <div class="col-md-4">
+                        <h6 class="text-white">FORTJENESTE</h6>
+                        <h2 class="text-white">@Details.Dækningsbidrag.ToString("N2") kr.</h2>
+                        <span class="badge bg-light text-success">DG: @Details.Dækningsgrad.ToString("N1") %</span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    // De 3 bokse (materialer, timer, tid)
+    <div class="row mb-4">
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm text-center" style="border-color: #071226;">
+                <div class="card-header bg-transparent fw-bold" style="border-color: #071226; color: #071226;">
+                    Materialer
+                </div>
+                <div class="card-body d-flex align-items-center justify-content-center flex-column">
+                    <h3 class="card-title text-dark">
+                        @if (IsClientView)
+                        {
+                            @Details.TotalPrisMaterialer.ToString("N2")
+                            // Kunden ser salgspris
+                        }
+                        else
+                        {
+                            @Details.TotalKostPrisMaterialer.ToString("N2")
+                            // Intern ser kostpris
+                        }
+                        kr.
+                    </h3>
+                    <small class="text-muted">
+                        @(IsClientView ? "Salg af materialer" : "Kostpris (Indkøb)")
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm text-center" style="border-color: #071226;">
+                <div class="card-header bg-transparent fw-bold" style="border-color: #071226; color: #071226;">
+                    Arbejdsløn
+                </div>
+                <div class="card-body d-flex align-items-center justify-content-center flex-column">
+                    <h3 class="card-title text-dark">
+                        @if (IsClientView)
+                        {
+                            // Kunde ser timepris
+                            @Details.TotalPrisTimer.ToString("N2")
+                        }
+                        else
+                        {
+                            // Intern ser lønomkostning
+                            @Details.TotalKostPrisTimer.ToString("N2")
+                        }
+                        kr.
+                    </h3>
+                    <small class="text-muted">
+                        @(IsClientView ? "Total for timer" : "Lønomkostninger")
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm text-center" style="border-color: #071226;">
+                <div class="card-header bg-transparent fw-bold" style="border-color: #071226; color: #071226;">
+                    Tid
+                </div>
+            
+                <div class="card-body d-flex align-items-center justify-content-center flex-column">
+                   
+                    <h3 class="card-title text-dark">@Details.TotalTimer.ToString("N2") timer</h3>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    // Beregninger for projektet (kommer fra serveren)
+    [Parameter] public Calculation? Details { get; set; }
+    // True = kundevisning, False = intern visning
+    [Parameter] public bool IsClientView { get; set; }
+}

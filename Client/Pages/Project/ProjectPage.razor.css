@@ -1,0 +1,142 @@
+ /* 1. CONTAINER - Holder styr på kassen */
+.table-card {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+/* 2. TABEL SETUP - Fjerner al "magi" og huller */
+.clean-table {
+    width: 100%;
+    border-collapse: collapse; /* VIGTIGT: Fjerner mellemrum mellem celler */
+    border-spacing: 0;
+}
+
+/* 3. GENEREL CELLE STYLING */
+.clean-table td {
+    padding: 16px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f0f0f0; /* Den grå streg */
+    background: white;
+}
+
+/* Fjerner stregen på den aller sidste række så det ser pænt ud i kassen */
+.clean-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Hover effekt på hele rækken */
+.clean-table tr:hover td {
+    background-color: #fafafa;
+}
+
+/* --- KOLONNE 1: Billede og Tekst --- */
+.cell-main { width: 50%; }
+
+.project-flex {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.project-flex img {
+    width: 45px;
+    height: 45px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid #eee;
+    background: #f9f9f9;
+}
+
+.text-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.name { font-weight: 600; color: #333; font-size: 0.95rem; }
+.sub-id { font-size: 0.75rem; color: #999; }
+
+/* --- KOLONNE 2: Dato --- */
+.cell-date { width: 20%; }
+
+.date-tag {
+    background: #051026;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* --- KOLONNE 3: Handlinger (Højre) --- */
+.cell-action { width: 30%; text-align: right; }
+
+.action-flex {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-simple {
+    background: white;
+    border: 1px solid #ddd;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-simple:hover { border-color: #333; color: #333; }
+
+/* --- MENU STYLING --- */
+.menu-container { position: relative; }
+
+.btn-dots {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.btn-dots:hover { background: #f0f0f0; color: #333; }
+
+.dropdown-popover {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 6px;
+    z-index: 999;
+    min-width: 140px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.dropdown-popover button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 14px;
+    background: none;
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: #333;
+}
+
+.dropdown-popover button:hover { background: #f5f5f5; }
+.dropdown-popover button.danger { color: #dc3545; border-top: 1px solid #eee; }
+.dropdown-popover button.danger:hover { background: #fff5f5; }

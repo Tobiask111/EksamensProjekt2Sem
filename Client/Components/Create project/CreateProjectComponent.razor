@@ -1,0 +1,137 @@
+@using Core
+@using Client.Service
+@inject NavigationManager Nav
+@inject HttpClient http
+
+<div class="create-page-back">
+    <div class="create-con">
+        <h3>Opret projekt</h3>
+
+        <EditForm Model="@aProject" OnValidSubmit="OnClickCreate">
+            
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="upload-grid">
+                <div class="upload-box">
+                    <label class="upload-title"><strong>Vælg time fil (.xls, .xlsx)</strong></label>
+                    <div class="upload-area">
+                        <InputFile OnChange="UploadFile" accept=".xls,.xlsx" />
+                    </div>
+                </div>
+
+                <div class="upload-box">
+                    <label class="upload-title"><strong>Vælg materiale fil (.xls, .xlsx)</strong></label>
+                    <div class="upload-area">
+                        <InputFile OnChange="MaterialUploadFile" accept=".xls,.xlsx" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-floating-group">
+                <InputText id="name" class="form-control" @bind-Value="aProject.Name" />
+                <label for="name">Navn</label>
+            </div>
+            <div class="form-floating-group">
+                <InputText id="billede" class="form-control" @bind-Value="aProject.ImageUrl" />
+                <label for="billede">Billede link</label>
+            </div>
+                
+            <div class="form-grid">
+                <div class="form-floating-group">
+                    <InputNumber id="svend" class="form-control" @bind-Value="aProject.SvendTimePris" />
+                    <label for="svend">Svend sats</label>
+                </div>
+                <div class="form-floating-group">
+                    <InputNumber id="lærling" class="form-control" @bind-Value="aProject.LærlingTimePris" />
+                    <label for="lærling">Lærling sats</label>
+                </div>
+                <div class="form-floating-group">
+                    <InputNumber id="konsulent" class="form-control" @bind-Value="aProject.KonsulentTimePris" />
+                    <label for="konsulent">Konsulent sats</label>
+                </div>
+                <div class="form-floating-group">
+                    <InputNumber id="arbejdsmand" class="form-control" @bind-Value="aProject.ArbejdsmandTimePris" />
+                    <label for="arbejdsmand">Arbejdsmand sats</label>
+                </div>
+            </div>
+                
+            <div class="">
+                <div class="">
+                    <button type="submit" class="opretbtn">Opret</button>
+                </div>
+            </div>
+            
+        </EditForm>
+    </div>
+</div>
+
+
+@code {
+    // Initialiserer en ny instans af projekt-modellen
+    Project aProject = new();
+
+    // Variabler til at holde filerne midlertidigt. 'IBrowserFile?' betyder, de kan være null.
+    IBrowserFile? timeFile;
+    IBrowserFile? materialeFile;
+
+    // Metode der køres, når brugeren vælger en fil i "Time" upload-feltet
+    public void UploadFile(InputFileChangeEventArgs e)
+    {
+        // Gemmer filen i variablen, men uploader den ikke endnu
+        timeFile = e.File; 
+    }
+
+    // Metode der køres, når brugeren vælger en fil i "Materiale" upload-feltet
+    public void MaterialUploadFile(InputFileChangeEventArgs e)
+    {
+        materialeFile = e.File;
+    }
+
+    // Hovedmetoden der køres, når brugeren trykker på "Opret" knappen
+    private async Task OnClickCreate()
+    {
+        // 1. Send projektdata (tekst/tal) til API'et for at oprette rækken i databasen
+        var response = await http.PostAsJsonAsync($"{Server.Url}/api/project", aProject);
+
+        // 2. Tjek om oprettelsen gik godt (HTTP status 200-299)
+        if (response.IsSuccessStatusCode)
+        {
+            // 3. Læs det nye ID som API'et returnerer 
+            var newProjectId = await response.Content.ReadFromJsonAsync<int>();
+
+            // 4. Hvis der er valgt en Time-fil, upload den nu med det nye ID
+            if (timeFile != null)
+            {
+                await UploadFileToApi(timeFile, newProjectId, "api/projecthours/upload");
+            }
+
+            // 5. Hvis der er valgt en Materiale-fil, upload den nu med det nye ID
+            if (materialeFile != null)
+            {
+                await UploadFileToApi(materialeFile, newProjectId, "api/projectmaterials/upload");
+            }
+        }
+
+        // 6. Nulstil formularen og naviger brugeren tilbage til forsiden
+        aProject = new();
+        Nav.NavigateTo("/");
+    }
+
+    // Hjælpemetode til selve fil-uploaden 
+    private async Task UploadFileToApi(IBrowserFile file, int projectId, string endpoint)
+    {
+        // Åbner en strøm til læsning af filen. 
+        // 10000000 bytes = ca. 10 MB grænse. Filer større end dette vil fejle.
+        var stream = file.OpenReadStream(10000000);
+
+        // Opretter en 'container' til filen, ligesom en HTML <form>
+        using var content = new MultipartFormDataContent();
+        
+        // Tilføjer fil-strømmen til indholdet med navnet "file"
+        content.Add(new StreamContent(stream), "file", file.Name);
+
+        // Sender filen til det specifikke endpoint (API URL) med projectId som query parameter
+        await http.PostAsync($"{Server.Url}/{endpoint}?projectId={projectId}", content);
+    }
+}

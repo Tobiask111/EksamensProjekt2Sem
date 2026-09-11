@@ -1,0 +1,130 @@
+@using Core
+@using Client.Service
+@inject HttpClient http
+@inject NavigationManager Nav
+@page "/project/edit/{ProjectId:int}"
+
+<div class="create-page-back">
+<div class="create-con">
+<h3>Redigere projekt</h3>
+
+@* Når siden startes, er _project null, fordi data fra serveren ikke er kommet endnu.
+Derfor vises ventetekst, så siden ikke crasher ved at prøve at vise tomme data *@
+@if (_project == null)
+{
+    <p><em>Indlæser projektdata...</em></p>
+}
+else
+{
+    /* Binder formularen til '_project' objektet. Når brugeren trykker 'Gem', køres metoden 'HandleSubmit' */
+        <EditForm Model="@_project" OnValidSubmit="HandleSubmit">
+                <DataAnnotationsValidator/>
+                <ValidationSummary/>
+
+                <div class="form-floating-group">
+                    <InputText id="name" class="form-control" @bind-Value="_project.Name"/>
+                    <label for="name">Navn</label>
+                </div>
+                <div class="form-floating-group">
+                    <InputText id="billede" class="form-control" @bind-Value="_project.ImageUrl"/>
+                    <label for="billede">Billede link</label>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-floating-group">
+                        <InputNumber id="svend" class="form-control" @bind-Value="_project.SvendTimePris"/>
+                        <label for="svend">Svend sats</label>
+                    </div>
+                    <div class="form-floating-group">
+                        <InputNumber id="lærling" class="form-control" @bind-Value="_project.LærlingTimePris"/>
+                        <label for="lærling">Lærling sats</label>
+                    </div>
+                    <div class="form-floating-group">
+                        <InputNumber id="konsulent" class="form-control" @bind-Value="_project.KonsulentTimePris"/>
+                        <label for="konsulent">Konsulent sats</label>
+                    </div>
+                    <div class="form-floating-group">
+                        <InputNumber id="arbejdsmand" class="form-control" @bind-Value="_project.ArbejdsmandTimePris"/>
+                        <label for="konsulent">Arbejdsmand sats</label>
+                    </div>
+                </div>
+
+                <div class="">
+                    <div class="">
+                        <button type="submit" class="opretbtn">Gem ændringer</button>
+                        <button type="button" class="cancelbtn" @onclick="Cancel">Annuller</button>
+                    </div>
+                </div>
+
+            </EditForm>
+}
+</div>
+</div>
+
+@code {
+    // Property der automatisk får værdien fra URL'en (f.eks. 5)
+    [Parameter] public int ProjectId { get; set; }
+    // Her gemmes de data vi redigerer. Starter som 'null'
+    private Project?  _project;
+    
+    private string? errorText;
+
+    // 1. Hent data (Kører når siden åbner)
+    protected override async Task OnInitializedAsync()
+    {
+        // Vi spørger serveren: "Giv mig alt info om projekt nr. [ProjectId]"
+        // Serveren returnerer en 'Calculation', som indeholder 'Project'-objektet.
+        var result = await http.GetFromJsonAsync<Calculation>($"{Server.Url}/api/project/{ProjectId}");
+        
+        if (result != null)
+        { 
+            // Vi trækker selve projekt-delen ud og lægger den i vores variabel,
+            // så formularen ovenfor kan vise dataene.
+            _project = result.Project;
+        }
+    }
+    
+    // 2. Gem data (Kører når man trykker "Gem ændringer")
+    private async Task HandleSubmit()
+    {
+        if (_project == null) return;
+
+        // Sikkerhedsforanstaltning: Vi sikrer os, at ID'et i objektet matcher URL'en.
+        _project.ProjectId = ProjectId;
+
+        try
+        {
+            // Her bruger vi 'PutAsJsonAsync'.
+            // PUT bruges normalt til at opdatere/rette noget eksisterende.
+            var res = await http.PutAsJsonAsync($"{Server.Url}/api/project/{ProjectId}", _project);
+
+            // Hvis serveren siger OK (status 200), sender vi brugeren til forsiden.
+            if (res.IsSuccessStatusCode)
+            {
+                Nav.NavigateTo("/");
+                return;
+            }
+
+            // Hvis fejl: Læs fejlbeskeden fra serveren, så vi kan se, hvad der gik galt.
+            var body = await res.Content.ReadAsStringAsync();
+            errorText = $"Fejl ved opdatering: {(int)res.StatusCode} {res.ReasonPhrase}. Server siger: {body}";
+            Console.WriteLine(errorText);
+        }
+        catch (HttpRequestException hrEx)
+        {
+            errorText = "Netværksfejl: " + hrEx.Message;
+            Console.WriteLine(errorText);
+        }
+        catch (Exception ex)
+        {
+            errorText = "Uventet fejl: " + ex.Message;
+            Console.WriteLine(errorText);
+        }
+    }
+    
+    // Knappen "Annuller" sender bare brugeren til forsiden
+    private void Cancel()
+    {
+        Nav.NavigateTo("/");
+    }
+}

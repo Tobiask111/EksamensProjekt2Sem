@@ -1,0 +1,269 @@
+.create-con {
+    background: white;
+    width: 100%;
+    max-width: 1450px;
+    padding: 35px 30px;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    animation: fadeIn 0.4s ease;
+    margin-top: 40px;
+}
+
+.create-con h3 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 600;
+}
+
+.form-floating-group {
+    position: relative;
+    margin-bottom: 22px;
+}
+
+.form-floating-group label {
+    position: absolute;
+    top: -10px;
+    left: 12px;
+    background: white;
+    padding: 0 6px;
+    font-size: 13px;
+    color: #555;
+}
+
+.form-floating-group .form-control {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    transition: border-color 0.25s ease;
+}
+
+.form-floating-group .form-control:focus {
+    border-color: #1d1e3c;
+    box-shadow: 0 0 5px rgba(76, 110, 245, 0.4);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* to kolonner */
+    column-gap: 22px; /* samme afstand som dine form-grupper */
+    align-items: start; /* sørger for labels ikke forskubber */
+    margin-bottom: 22px;
+}
+
+.upload-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.upload-box {
+    background: white;
+    border: 1px solid #e4e6ef;
+    border-radius: 16px;
+    padding: 16px 18px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    margin-bottom: 22px;
+}
+
+.upload-title {
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+/* Stort flot uploadområde */
+.upload-area {
+    border: 1px dashed #c8cddd;
+    border-radius: 12px;
+    padding: 28px 16px;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+    transition: .25s;
+}
+
+.upload-area:hover {
+    border-color: #8a8ff5;
+    background: #f7f8ff;
+}
+
+.upload-icon {
+    width: 26px;
+    height: 26px;
+    color: #4a4df3;
+    margin-bottom: 6px;
+}
+
+.upload-btn {
+    display: block;
+    font-weight: 600;
+    color: #1d1e3c;
+    font-size: 15px;
+}
+
+/* Fil-liste i upload-området */
+.upload-area .mt-2 {
+    margin-top: 12px; /* lidt afstand til uploadknap */
+}
+
+/* Fjern standard bullets og sæt max-højde så listen kan scrolles */
+.upload-area ul {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0 0;
+    max-height: 220px; /* juster efter behov */
+    overflow-y: auto;
+    display: block;
+    gap: 8px;
+}
+
+/* Style hvert list item som en kort "chip" */
+.upload-area ul li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,0.04);
+    box-shadow: 0 2px 8px rgba(18, 20, 40, 0.04);
+    font-size: 13px;
+    color: #222;
+}
+
+/* Fil-ikon (unicode) før navnet — virker uden ekstra markup */
+.upload-area ul li::before {
+    content: "📄";
+    display: inline-block;
+    width: 20px;
+    text-align: center;
+    font-size: 16px;
+    flex: 0 0 20px;
+}
+
+/* Navn: sørg for at afkorte lange navne med ellipsis */
+.upload-area ul li .file-name,
+.upload-area ul li {
+    min-width: 0; /* nødvendig for text-overflow i flex */
+}
+
+.upload-area ul li .file-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1 1 auto;
+}
+
+/* Filstørrelse til højre */
+.upload-area ul li .file-size {
+    flex: 0 0 auto;
+    margin-left: 10px;
+    font-size: 12px;
+    color: #6b6f7a;
+}
+
+/* Valgfri: lille slet-knap til at fjerne en valgt fil */
+.upload-area ul li .remove-btn {
+    appearance: none;
+    border: none;
+    background: transparent;
+    padding: 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #d9534f;
+    margin-left: 8px;
+    flex: 0 0 auto;
+}
+.upload-area ul li .remove-btn:hover,
+.upload-area ul li .remove-btn:focus {
+    background: rgba(217,83,79,0.06);
+    outline: none;
+}
+
+/* Alternativ baggrund for bedre kontrast på hover */
+.upload-area ul li:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+/* Scrollbar styling (enkelt og diskret) */
+.upload-area ul::-webkit-scrollbar {
+    width: 8px;
+}
+.upload-area ul::-webkit-scrollbar-track {
+    background: transparent;
+}
+.upload-area ul::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.08);
+    border-radius: 8px;
+}
+
+/* Mobil: mindre padding og større max-højde */
+@media (max-width: 700px) {
+    .upload-area ul {
+        max-height: 180px;
+    }
+    .upload-area ul li {
+        padding: 8px;
+        font-size: 14px;
+    }
+}
+
+.opretbtn {
+    background: #1d1e3c;                /* mørk blå – matcher dine focus borders */
+    color: white;
+    padding: 8px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.25s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.opretbtn:hover {
+    background: #24264a;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.16);
+    transform: translateY(-1px);
+}
+
+.cancelbtn:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.10);
+}
+
+.cancelbtn {
+    background: #434343;                /* mørk blå – matcher dine focus borders */
+    color: white;
+    padding: 8px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.25s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.cancelbtn:hover {
+    background: #2e2e2e;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.16);
+    transform: translateY(-1px);
+}
+
+.cancelbtn:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.10);
+}
+
+
+/* Mobil */
+@media (max-width: 700px) {
+    .upload-grid {
+        grid-template-columns: 1fr;
+    }
+}

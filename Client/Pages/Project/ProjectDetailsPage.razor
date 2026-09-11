@@ -1,0 +1,58 @@
+@page "/project/{Id:int}"
+@using Core
+@using Client.Components.ProjectDetails
+@using Client.Service
+@inject HttpClient Http
+@inject ProjectService ProjectService
+
+<PageTitle>Projekt Detaljer</PageTitle>
+
+@if (details == null)
+{
+    <p><em>Indlæser beregninger fra serveren...</em></p>
+}
+else
+{
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1>@details.Project.Name</h1>
+                <span class="badge bg-secondary">Oprettet: @details.Project.DateCreated.ToShortDateString()</span>
+            </div>
+
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="clientViewSwitch"
+                       @bind="showClientView">
+                <label class="form-check-label switch-label" for="clientViewSwitch">
+                    @(showClientView ? "Kundevisning: AKTIV" : "Kundevisning: INAKTIV")
+                </label>
+            </div>
+        </div>
+
+        <PrisOverblik Details="details" IsClientView="showClientView" />
+
+        <RessourceOverblik HourGroups="details.GroupedHours"
+                           MaterialGroups="details.GroupedMaterialsClientView"
+                           IsClientView="showClientView" />
+
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; } // Tager tallet fra URL'en f.eks. /project/5, bliver til id 5
+
+    private Calculation? details;
+    // Denne bool styrer "kunde visning" knappen. False = Virksomhedens oplysninger. True = Kundens oplysninger
+    private bool showClientView = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 1. Service henter data
+        // 2. Serveren har allerede sorteret timer og materialer
+        // 3. Vi gemmer det i 'details'
+        details = await ProjectService.GetProjectDetails(Id);
+        details = await Http.GetFromJsonAsync<Calculation>($"{Server.Url}/api/project/{Id}");
+    }
+
+   
+}

@@ -1,0 +1,78 @@
+﻿@page "/adduser"
+@using Core
+@using Client.Service
+@inject HttpClient http
+@inject NavigationManager navMan
+
+<PageTitle>Opret Bruger</PageTitle>
+
+<div class="d-flex justify-content-center">
+    <div class="create-con">
+        <h3>Opret Ny Bruger</h3>
+
+        <EditForm Model="@_user" OnValidSubmit="@HandleValidSubmit">
+            <DataAnnotationsValidator />
+            
+            @* Viser kun fejl hvis der er nogen *@
+            @if (context.GetValidationMessages().Any())
+            {
+                <div class="alert alert-danger">
+                    <ValidationSummary />
+                </div>
+            }
+
+            <div class="form-grid">
+                <div class="form-floating-group">
+                    <InputText id="UserName" @bind-Value="_user.UserName" class="form-control" placeholder=" " />
+                    <label for="UserName">Brugernavn</label>
+                </div>
+
+                <div class="form-floating-group">
+                    <InputText id="Password" type="password" @bind-Value="_user.Password" class="form-control" placeholder=" " />
+                    <label for="Password">Adgangskode</label>
+                </div>
+            </div>
+
+            <div class="form-floating-group">
+                <InputSelect id="Role" @bind-Value="_user.Role" class="form-control form-select-styled">
+                    @foreach (var r in roles)
+                    {
+                        <option value="@r">@r</option>
+                    }
+                </InputSelect>
+                <label for="Role">Rolle</label>
+            </div>
+
+            <div class="d-flex gap-3 mt-4">
+                <button type="submit" class="opretbtn">Opret Bruger</button>
+                <button type="button" class="cancelbtn" @onclick="Cancel">Annuller</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    // Initialiserer en ny bruger med standardrollen "Bruger"
+    private Users _user = new() { Role = "Bruger" }; 
+    private string[] roles = ["Bruger", "Admin"];
+
+    // Køres kun når formularen er gyldig (valideret ok)
+    private async Task HandleValidSubmit()
+    {
+        // Sender brugerdata som JSON via en POST request direkte til API'et
+        var response = await http.PostAsJsonAsync($"{Server.Url}/api/user", _user);
+
+        // Hvis serveren svarer OK (200), nulstiller vi og går tilbage til oversigten
+        if (response.IsSuccessStatusCode)
+        {
+            _user = new Users();
+            navMan.NavigateTo("adminuser");
+        }
+    }
+
+    private void Cancel()
+    {
+        // Sender brugeren tilbage til admin-oversigten uden at gemme
+        navMan.NavigateTo("adminuser");
+    }
+}

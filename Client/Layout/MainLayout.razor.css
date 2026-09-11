@@ -1,0 +1,113 @@
+:root{
+    --glow: rgba(106,167,214,0.06);
+    --bg-start: #071226;
+    --bg-end:   #071226;
+}
+
+html, body {
+    background: #ff8100;
+    margin: 0;
+    height: 100%;
+}
+
+.page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+    background: #Ffffff;
+}
+
+
+
+.sidebar {
+    background: radial-gradient(1200px 1200px at 10% 10%, rgba(106, 167, 214, 0.04), transparent),
+    linear-gradient(180deg, #051026 0%, #071226 60%);
+    box-shadow: rgba(2, 8, 23, 0.6) 0px 8px 30px;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-self: flex-start;
+    border-radius: 10px;
+    position: sticky;
+    margin: 20px 10px 0 20px;
+}
+
+.top-row {
+    background: radial-gradient(1200px 1200px at 10% 10%, rgba(106, 167, 214, 0.04), transparent),
+    linear-gradient(180deg, #051026 0%, #071226 60%);
+    box-shadow: rgba(2, 8, 23, 0.6) 0px 8px 30px;
+    border-radius: 10px;
+    position: sticky;
+    margin: 20px 20px 20px 10px;
+    justify-content: flex-end;
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.top-row ::deep a, .top-row ::deep .btn-link {
+    white-space: nowrap;
+    margin-left: 1.5rem;
+    text-decoration: none;
+}
+
+.top-row ::deep a:hover, .top-row ::deep .btn-link:hover {
+    text-decoration: underline;
+}
+
+.top-row ::deep a:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 640.98px) {
+    .top-row {
+        justify-content: space-between;
+    }
+
+    .top-row ::deep a, .top-row ::deep .btn-link {
+        margin-left: 0;
+    }
+}
+
+@media (min-width: 641px) {
+    .page {
+        flex-direction: row;
+    }
+
+    @media (min-width: 641px) {
+        .sidebar {
+            width: 250px;
+            position: sticky;
+            top: 20px; /* important: where it sticks */
+            align-self: flex-start; /* prevents flex stretching */
+            margin: 20px 10px 0 20px;
+            border-radius: 10px;
+            /* limit height so it can actually "stick" within viewport */
+            max-height: calc(100vh - 40px); /* viewport minus top+bottom margins */
+            overflow: auto; /* allow internal scrolling if needed */
+            z-index: 2;
+        }
+
+        .top-row {
+            position: relative;
+            top: 0;
+            z-index: 1;
+        }
+
+        .top-row.auth ::deep a:first-child {
+            flex: 1;
+            text-align: right;
+            width: 0;
+        }
+
+        .top-row, article {
+            padding-left: 2rem !important;
+            padding-right: 1.5rem !important;
+        }
+    }
+}

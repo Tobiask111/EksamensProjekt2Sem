@@ -1,0 +1,49 @@
+﻿@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject NavigationManager Nav
+@using Client.Pages
+
+@if (!initialized)
+{
+    /* small placeholder while we read local storage */
+    <div></div>
+}
+else if (!isLoggedIn)
+{
+    /* Render the LoginPage component directly if not logged in */
+    <LoginPage/>
+}
+else
+{
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof(Client.Layout.MainLayout)" />
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <LayoutView Layout="@typeof(Client.Layout.MainLayout)">
+                <p>Page not found.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+}
+
+@code
+{
+    private bool initialized = false;
+    private bool isLoggedIn = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var user = await LocalStorage.GetItemAsync<object>("user");
+            isLoggedIn = user != null;
+        }
+        catch (Exception)
+        {
+            // If localStorage read fails, treat as not logged in
+            isLoggedIn = false;
+        }
+        initialized = true;
+    }
+}

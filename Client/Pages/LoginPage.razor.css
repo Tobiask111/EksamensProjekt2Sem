@@ -1,0 +1,119 @@
+/* ---------- Page Background ---------- */
+.login-page-back {
+    width: 100%;
+    height: 100vh;
+    background: radial-gradient(1200px 1200px at 10% 10%, rgba(106, 167, 214, 0.04), transparent),
+    linear-gradient(180deg, #051026 0%, #071226 60%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* ---------- Login Container ---------- */
+.login-con {
+    background: white;
+    width: 100%;
+    max-width: 380px;
+    padding: 35px 30px;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    animation: fadeIn 0.4s ease;
+}
+
+.login-con h3 {
+    text-align: center;
+    margin-bottom: 25px;
+    font-weight: 600;
+}
+
+/* ---------- Input Groups ---------- */
+.form-floating-group {
+    position: relative;
+    margin-bottom: 22px;
+}
+
+.form-floating-group label {
+    position: absolute;
+    top: -10px;
+    left: 12px;
+    background: white;
+    padding: 0 6px;
+    font-size: 13px;
+    color: #555;
+}
+
+.form-floating-group .form-control {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    transition: border-color 0.25s ease;
+}
+
+.form-floating-group .form-control:focus {
+    border-color: #1d1e3c;
+    box-shadow: 0 0 5px rgba(76, 110, 245, 0.4);
+}
+
+/* ---------- Password Eye Icon ---------- */
+.form-floating-group i {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    font-size: 20px;
+    cursor: pointer;
+    transform: translateY(-50%);
+    color: #666;
+    transition: 0.2s;
+}
+
+.form-floating-group i:hover {
+    color: #111;
+}
+
+/* ---------- Login Button ---------- */
+button.btn-primary {
+    width: 80%;
+    border-radius: 25px;
+    padding: 10px;
+    font-size: 16px;
+    margin-top: 5px;
+    background-color: #1d1e3c;
+}
+
+button.btn-primary:hover {
+    background-color: #3B5BDB;
+}
+
+/* ---------- Error Message ---------- */
+.error-message {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 6px;
+    background-color: #ffe5e5;
+    color: #c92a2a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    gap: 8px;
+    border: 1px solid #ffa8a8;
+}
+
+.error-icon {
+    font-size: 18px;
+}
+
+/* ---------- Fade Animation ---------- */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+

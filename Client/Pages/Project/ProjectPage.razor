@@ -1,0 +1,153 @@
+@page "/"
+@using Core
+@using Client.Service
+@inject HttpClient Http
+@inject NavigationManager Nav
+
+<div class="admin-container">
+    <div class="header-section">
+        <h3>Mine projekter</h3>
+    </div>
+
+    @* _projects starter med at være 'null'. Så længe den er det, vises en spinner. *@
+    @if (_projects == null)
+    {
+        <div class="loading-state">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p>Indlæser projekter...</p>
+        </div>
+    }
+    @* Hvis listen er hentet, men den er tom (0 projekter), vises en besked. *@
+    else if (_projects.Count == 0)
+    {
+        <div class="empty-state">
+            <p>Ingen projekter fundet.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-card">
+            <table class="clean-table">
+                <tbody>
+                @* Kører et loop igennem alle projekter i listen *@
+                @foreach (var project in _projects)
+                {
+                    <tr>
+                        @* BILLEDE OG NAVN *@
+                        <td class="cell-main">
+                            <div class="project-flex">
+                                @* Hvis billed-linket er dødt eller tomt,
+                                       så indlæser den automatisk et gråt placeholder-billede i stedet. *@
+                                <img src="@project.ImageUrl" alt="img"
+                                     onerror="this.src='https://placehold.co/100?text=No+Img'"/>
+                                <div class="text-group">
+                                    <span class="name">@project.Name</span>
+                                    <span class="sub-id">ID: #@project.ProjectId</span>
+                                </div>
+                            </div>
+                        </td>
+
+                        @* DATO *@
+                        <td class="cell-date">
+                            <span class="date-tag">
+                                @project.DateCreated.ToString("dd. MMM yyyy")
+                            </span>
+                        </td>
+
+                        @* KNAPPER *@
+                        <td class="cell-action">
+                            <div class="action-flex">
+                                @* Knap til at se detaljer (man sendes til ProjectDetailsPage) *@
+                                <button class="btn-simple" @onclick="() => GotoDetails(project.ProjectId)">
+                                    Se detaljer
+                                </button>
+
+                                @* Den lille menu (3 prikker) *@
+                                <div class="menu-container">
+                                    <button class="btn-dots"
+                                            @onclick="() => ToggleMenu(project.ProjectId)"
+                                            @onfocusout="CloseMenuDelayed">
+                                        @* Ikon kode for tre prikker ... *@
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots" viewBox="0 0 16 16">
+                                            <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/>
+                                        </svg>
+                                    </button>
+
+                                    @* Her tjekkes: Er det lige præcis dette projekt, der har menuen åben?
+                                            Vi bruger ID'et til at styre det, så ikke alle menuer åbner samtidig. *@
+                                    @if (_activeMenuId == project.ProjectId)
+                                    {
+                                        <div class="dropdown-popover">
+                                            <button @onclick="() => GotoEdit(project.ProjectId)">
+                                                <i class="bi bi-pencil"></i> Rediger
+                                            </button>
+                                            <button class="danger" @onclick="() => DeleteProject(project.ProjectId)">
+                                                <i class="bi bi-trash"></i> Slet
+                                            </button>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@code {
+    // Listen over projekter. Den er null indtil der er hentet data.
+    private List<Project>? _projects;
+    // Holder styr på, hvilket projekt der har sin "3-prikker-menu" åben lige nu.
+    // Hvis den er null, er ingen menuer åbne.
+    private int? _activeMenuId = null;
+
+    // 1. HENT PROJEKTER (Kører når siden starter)
+    protected override async Task OnInitializedAsync()
+    {
+        try 
+        {
+            // Henter listen fra API'et: api/project
+            _projects = await Http.GetFromJsonAsync<List<Project>>($"{Server.Url}/api/project");
+        }
+        catch (Exception ex)
+        {
+            // Hvis serveren er nede, skrives fejlen i browserens konsol
+            Console.WriteLine($"Fejl: {ex.Message}");
+        }
+    }
+    
+    // Navigations-hjælpere
+    private void GotoDetails(int id) => Nav.NavigateTo($"project/{id}");
+    private void GotoEdit(int id) => Nav.NavigateTo($"project/edit/{id}");
+
+    // Åben/Luk menu
+    // Hvis man klikker på samme ID igen, lukkes menuen (null).
+    // Hvis man klikker på et nyt ID, åbnes den menu (id).
+    private void ToggleMenu(int id) => _activeMenuId = (_activeMenuId == id) ? null : id;
+
+    // Luk menu ved klik udenfor
+    // Når musen forlader knappen (focus out), lukker vi menuen.
+    // Vi venter 200ms (Delay), så brugeren når at registrere et klik på "Slet" eller "Rediger", inden menuen forsvinder helt.
+    private async Task CloseMenuDelayed()
+    {
+        await Task.Delay(200);
+        _activeMenuId = null;
+    }
+
+    // Slet projekt
+    private async Task DeleteProject(int id)
+    {
+        // Beder serveren slette projektet
+        var response = await Http.DeleteAsync($"{Server.Url}/api/project/{id}");
+        // Hvis det lykkedes
+        if (response.IsSuccessStatusCode)
+        {
+            // så hentes hele listen igen, så det slettede projekt forsvinder fra skærmen.
+            _projects = await Http.GetFromJsonAsync<List<Project>>($"{Server.Url}/api/project");
+            _activeMenuId = null;
+        }
+    }
+}
